@@ -3,9 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Title</title>
+    <title>City Medical Clinic | Book an Appointment</title>
+    <!-- Add your CSS link here -->
 </head>
 <body>
-    <p>This is a paragraph!</p>
+
+    <!-- HEADER: Navigation and Branding -->
+    <header>
+        <div class="logo">
+            <h1>City Medical Clinic</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Our Services</a></li>
+                <li><a href="#doctors">Our Doctors</a></li>
+                <li><a href="#contact">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- HERO SECTION: Main call to action -->
+        <section id="home">
+            <h2>Your Health is Our Priority</h2>
+            <p>Compassionate care for you and your family. Book your visit today.</p>
+            <a href="#book-appointment"><button>Book an Appointment</button></a>
+        </section>
+
+        <hr>
+
+        <!-- SERVICES SECTION: What the clinic offers -->
+        <section id="services">
+            <h2>Our Medical Services</h2>
+            <ul>
+                <li>General Practice</li>
+                <li>Pediatrics</li>
+                <li>Cardiology</li>
+                <li>Laboratory Tests</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <!-- BOOKING FORM: The core functionality -->
+        <section id="book-appointment">
+            <h2>Request an Appointment</h2>
+            <form action="/submit-appointment" method="POST">
+                
+                <label for="patient-name">Full Name:</label>
+                <input type="text" id="patient-name" name="patient-name" required>
+                <br><br>
+
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" name="email" required>
+                <br><br>
+
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" required>
+                <br><br>
+
+                <label for="department">Select Department:</label>
+                <select id="department" name="department" required>
+                    <option value="">--Please choose an option--</option>
+                    <option value="general">General Practice</option>
+                    <option value="pediatrics">Pediatrics</option>
+                    <option value="cardiology">Cardiology</option>
+                </select>
+                <br><br>
+
+                <label for="date">Preferred Date:</label>
+                <input type="date" id="date" name="date" required>
+                <br><br>
+
+                <label for="symptoms">Brief Reason for Visit:</label><br>
+                <textarea id="symptoms" name="symptoms" rows="4" cols="50"></textarea>
+                <br><br>
+
+                <button type="submit">Submit Request</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- FOOTER: Contact information and closing details -->
+    <footer>
+        <section id="contact">
+            <h3>Contact Information</h3>
+            <p><strong>Address:</strong> 123 Wellness Way, Healthville, HC 12345</p>
+            <p><strong>Phone:</strong> (555) 123-4567</p>
+            <p><strong>Email:</strong> info@citymedicalclinic.com</p>
+            <p><strong>Hours:</strong> Mon-Fri 8:00 AM - 6:00 PM</p>
+        </section>
+        <p>&copy; 2026 City Medical Clinic. All rights reserved.</p>
+    </footer>
+
 </body>
 </html>
