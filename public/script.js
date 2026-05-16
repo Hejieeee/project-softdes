@@ -1,5 +1,5 @@
 /* ============================================
-   MediFlow AI - JavaScript
+   MediFlow AI - JavaScript (Updated for AI & Auto-fill)
    ============================================ */
 
 // ============================================
@@ -14,8 +14,8 @@ function showSection(sectionId) {
 // ============================================
 // Symptom Triage AI
 // ============================================
-function analyzeSymptoms() {
-    const input = document.getElementById('symptomInput').value.toLowerCase();
+async function analyzeSymptoms() {
+    const input = document.getElementById('symptomInput').value;
     const resultBox = document.getElementById('triageResult');
     const title = document.getElementById('urgencyTitle');
     const desc = document.getElementById('urgencyDesc');
@@ -26,89 +26,74 @@ function analyzeSymptoms() {
         return;
     }
 
-    // AI Logic: Keyword-based symptom analysis
-    let urgency = 'normal';
-    let department = 'General Medicine';
-    let doctor = 'Dr. Michael Chen';
-    let doctorTitle = 'General Practitioner';
-    let recommendation = '';
+    // Show loading state
+    resultBox.className = 'result-box show result-normal';
+    title.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+    desc.textContent = 'Gemini is evaluating your symptoms...';
+    doctorDiv.innerHTML = '';
 
-    const urgentKeywords = [
-        'chest pain', 'heart attack', 'stroke', 'severe bleeding', 
-        'unconscious', 'cant breathe', 'difficulty breathing', 'severe allergic'
-    ];
+    try {
+        const response = await fetch('/api/triage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ symptoms: input })
+        });
+        
+        const data = await response.json();
 
-    const moderateKeywords = [
-        'fever', 'infection', 'pain', 'headache', 'nausea', 
-        'vomiting', 'dizzy', 'rash'
-    ];
+        // Update UI based on Gemini AI response
+        resultBox.className = 'result-box show result-' + data.urgency;
 
-    // Determine urgency and department
-    if (urgentKeywords.some(k => input.includes(k))) {
-        urgency = 'urgent';
-        department = 'Emergency Medicine';
-        doctor = 'Dr. Emily Rodriguez';
-        doctorTitle = 'Emergency Physician';
-        recommendation = 'Based on your symptoms, we recommend immediate attention. Please proceed to the Emergency Department or call emergency services if symptoms worsen.';
-    } else if (input.includes('head') || input.includes('brain') || input.includes('migraine') || input.includes('seizure')) {
-        department = 'Neurology';
-        doctor = 'Dr. James Wilson';
-        doctorTitle = 'Neurologist';
-        recommendation = 'Your symptoms suggest a neurological concern. We recommend a neurological examination.';
-    } else if (input.includes('heart') || input.includes('chest') || input.includes('blood pressure')) {
-        department = 'Cardiology';
-        doctor = 'Dr. Sarah Johnson';
-        doctorTitle = 'Cardiologist';
-        recommendation = 'Cardiovascular symptoms detected. A cardiac evaluation is recommended.';
-    } else if (input.includes('skin') || input.includes('rash') || input.includes('acne') || input.includes('mole')) {
-        department = 'Dermatology';
-        doctor = 'Dr. Lisa Park';
-        doctorTitle = 'Dermatologist';
-        recommendation = 'Dermatological symptoms identified. A skin examination is recommended.';
-    } else if (input.includes('bone') || input.includes('joint') || input.includes('fracture') || input.includes('back pain')) {
-        department = 'Orthopedics';
-        doctor = 'Dr. Robert Kim';
-        doctorTitle = 'Orthopedic Surgeon';
-        recommendation = 'Musculoskeletal symptoms detected. An orthopedic consultation is recommended.';
-    } else if (moderateKeywords.some(k => input.includes(k))) {
-        urgency = 'moderate';
-        recommendation = 'Your symptoms require medical attention. We recommend scheduling an appointment within 24-48 hours.';
-    } else {
-        recommendation = 'We recommend a general checkup to better assess your condition.';
-    }
+        if (data.urgency === 'urgent') {
+            title.innerHTML = '<i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i> Urgent Attention Required';
+        } else if (data.urgency === 'moderate') {
+            title.innerHTML = '<i class="fas fa-info-circle" style="color: var(--warning);"></i> Moderate Priority';
+        } else {
+            title.innerHTML = '<i class="fas fa-check-circle" style="color: var(--secondary);"></i> Routine Care Recommended';
+        }
 
-    // Update UI
-    resultBox.className = 'result-box show result-' + urgency;
+        desc.textContent = data.recommendation;
 
-    if (urgency === 'urgent') {
-        title.innerHTML = '<i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i> Urgent Attention Required';
-    } else if (urgency === 'moderate') {
-        title.innerHTML = '<i class="fas fa-info-circle" style="color: var(--warning);"></i> Moderate Priority';
-    } else {
-        title.innerHTML = '<i class="fas fa-check-circle" style="color: var(--secondary);"></i> Routine Care Recommended';
-    }
-
-    desc.textContent = recommendation;
-
-    doctorDiv.innerHTML = `
-        <div class="doctor-card">
-            <div class="doctor-avatar">
-                <i class="fas fa-user-md"></i>
+        // Auto-fill trigger added to Book Now button
+        doctorDiv.innerHTML = `
+            <div class="doctor-card">
+                <div class="doctor-avatar">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="doctor-info">
+                    <h4>${data.doctor}</h4>
+                    <p>${data.doctorTitle} | ${data.department.charAt(0).toUpperCase() + data.department.slice(1)}</p>
+                    <span class="badge ${data.urgency === 'urgent' ? 'badge-urgent' : 'badge-normal'}">
+                        ${data.urgency === 'urgent' ? 'Available Now' : 'Next Available: Today'}
+                    </span>
+                </div>
+                <button class="cta-btn" style="margin-left: auto; padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="goToBooking('${data.department}', '${data.doctor}')">
+                    Book Now
+                </button>
             </div>
-            <div class="doctor-info">
-                <h4>${doctor}</h4>
-                <p>${doctorTitle} | ${department}</p>
-                <span class="badge ${urgency === 'urgent' ? 'badge-urgent' : 'badge-normal'}">
-                    ${urgency === 'urgent' ? 'Available Now' : 'Next Available: Today'}
-                </span>
-            </div>
-            <button class="cta-btn" style="margin-left: auto; padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="showSection('booking')">
-                Book Now
-            </button>
-        </div>
-    `;
+        `;
 
-    showToast('Analysis complete! See recommendation below.');
+        showToast('Analysis complete! See recommendation below.');
+    } catch (error) {
+        showToast('Error analyzing symptoms.', 'error');
+        title.innerHTML = '<i class="fas fa-exclamation-circle" style="color: var(--danger);"></i> Error';
+        desc.textContent = 'Could not connect to the AI service. Please ensure the Node.js server is running.';
+    }
+}
+
+// Function to transition and auto-fill the booking section
+function goToBooking(department, doctor) {
+    showSection('booking');
+    
+    const deptSelect = document.getElementById('department');
+    deptSelect.value = department.toLowerCase();
+    
+    updateDoctors(); // Populate doctor dropdown
+    
+    const docSelect = document.getElementById('doctor');
+    docSelect.value = doctor;
+    
+    showToast('Details auto-filled from triage!');
 }
 
 // ============================================
@@ -155,6 +140,7 @@ function bookAppointment() {
         return;
     }
 
+    // Update My Appointments list
     const list = document.getElementById('appointmentsList');
     const newAppt = document.createElement('div');
     newAppt.className = 'appointment-item';
@@ -163,9 +149,33 @@ function bookAppointment() {
             <h4>${doctor}</h4>
             <p><i class="fas fa-stethoscope"></i> ${dept.charAt(0).toUpperCase() + dept.slice(1)} | ${date} at ${selectedTime}</p>
         </div>
-        <span class="status-badge status-pending">Pending</span>
+        <span class="status-badge status-confirmed">Confirmed</span>
     `;
     list.insertBefore(newAppt, list.firstChild);
+
+    // Overwrite and remove the placeholder Queue Status
+    const queueContainer = document.querySelector('.queue-container');
+    queueContainer.innerHTML = `
+        <div class="queue-card">
+            <div class="queue-header">
+                <div>
+                    <h3>Upcoming Appointment</h3>
+                    <p class="text-light">${doctor} - ${dept.charAt(0).toUpperCase() + dept.slice(1)}</p>
+                    <p class="text-small" style="margin-top: 5px;">Patient: ${name}</p>
+                </div>
+                <div class="wait-time">
+                    <div class="wait-time-number">Confirmed</div>
+                    <div class="text-small">${date} @ ${selectedTime}</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill pulse" style="width: 100%; background: var(--secondary);"></div>
+            </div>
+            <div class="queue-meta" style="margin-top: 1rem;">
+                <span class="text-small"><i class="fas fa-info-circle"></i> Please arrive 10 minutes early.</span>
+            </div>
+        </div>
+    `;
 
     showToast('Appointment booked successfully!');
 
@@ -173,9 +183,14 @@ function bookAppointment() {
     document.getElementById('patientName').value = '';
     document.getElementById('department').value = '';
     document.getElementById('doctor').innerHTML = '<option value="">Select Doctor</option>';
-    document.getElementById('appointmentDate').value = '';
+    document.getElementById('appointmentDate').valueAsDate = new Date();
     document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
     selectedTime = null;
+    
+    // Auto-redirect to the queue page to see updates
+    setTimeout(() => {
+        showSection('queue');
+    }, 1200);
 }
 
 // ============================================
@@ -231,51 +246,37 @@ function removeTyping() {
     if (typing) typing.remove();
 }
 
-function processBotResponse(userText) {
+async function processBotResponse(userText) {
     showTyping();
 
-    setTimeout(() => {
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: userText })
+        });
+        
+        const data = await response.json();
         removeTyping();
-        const text = userText.toLowerCase();
-        let response = '';
-        let actions = '';
 
-        if (text.includes('symptom') || text.includes('pain') || text.includes('feel')) {
-            response = 'I can help you analyze your symptoms. Please describe what you are experiencing, and I will recommend the right department and urgency level.';
-            actions = `<div class="quick-actions">
-                <button class="quick-action-btn" onclick="sendQuickMessage('I have chest pain')">Chest pain</button>
-                <button class="quick-action-btn" onclick="sendQuickMessage('I have a headache')">Headache</button>
-                <button class="quick-action-btn" onclick="sendQuickMessage('I have a fever')">Fever</button>
-            </div>`;
-        } else if (text.includes('book') || text.includes('appointment') || text.includes('schedule')) {
-            response = 'I can help you book an appointment. Would you like to see available doctors and time slots?';
-            actions = `<div class="quick-actions">
-                <button class="quick-action-btn" onclick="showSection('booking'); toggleChat();">Go to Booking</button>
-                <button class="quick-action-btn" onclick="sendQuickMessage('Show available doctors')">Show doctors</button>
-            </div>`;
-        } else if (text.includes('queue') || text.includes('wait') || text.includes('time')) {
-            response = 'You are currently #4 in the Cardiology queue with an estimated wait time of 45 minutes. Your appointment with Dr. Sarah Johnson is in 15 minutes.';
-            actions = `<div class="quick-actions">
-                <button class="quick-action-btn" onclick="showSection('queue'); toggleChat();">View Full Status</button>
-            </div>`;
-        } else if (text.includes('doctor') || text.includes('cardiology') || text.includes('neurology')) {
-            response = 'We have specialists across multiple departments. Our cardiology team includes Dr. Sarah Johnson and Dr. Ahmed Hassan. Would you like to see their availability?';
-        } else if (text.includes('hello') || text.includes('hi')) {
-            response = 'Hello! How can I assist you with your healthcare needs today?';
-        } else {
-            response = 'I understand. For more specific medical advice, I recommend using our Symptom Triage feature or booking a consultation with a specialist. Is there anything specific you would like help with?';
-            actions = `<div class="quick-actions">
-                <button class="quick-action-btn" onclick="showSection('triage'); toggleChat();">Symptom Check</button>
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message bot';
+        
+        let actions = '';
+        if (data.response.toLowerCase().includes('book') || data.response.toLowerCase().includes('appointment')) {
+             actions = `<div class="quick-actions">
                 <button class="quick-action-btn" onclick="showSection('booking'); toggleChat();">Book Now</button>
             </div>`;
         }
 
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'message bot';
-        msgDiv.innerHTML = response + actions;
+        msgDiv.innerHTML = data.response + actions;
         document.getElementById('chatMessages').appendChild(msgDiv);
         document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
-    }, 1000 + Math.random() * 1000);
+        
+    } catch (error) {
+        removeTyping();
+        addMessage("Sorry, I'm having trouble connecting to the AI server. Please ensure the Node server is running.", 'bot');
+    }
 }
 
 // ============================================

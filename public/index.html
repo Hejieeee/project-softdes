@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Navigation -->
     <nav>
         <div class="logo">
             <i class="fas fa-heartbeat"></i>
@@ -22,13 +21,11 @@
         </ul>
     </nav>
 
-    <!-- Toast -->
     <div id="toast" class="toast">
         <i class="fas fa-check-circle"></i>
         <span id="toast-message">Success!</span>
     </div>
 
-    <!-- Home Section -->
     <section id="home" class="section active">
         <div class="hero">
             <h1>AI-Powered Healthcare</h1>
@@ -64,7 +61,6 @@
         </div>
     </section>
 
-    <!-- Symptom Triage Section -->
     <section id="triage" class="section">
         <div class="hero hero-small">
             <h1><i class="fas fa-stethoscope"></i> AI Symptom Triage</h1>
@@ -87,7 +83,6 @@
         </div>
     </section>
 
-    <!-- Booking Section -->
     <section id="booking" class="section">
         <div class="hero hero-small">
             <h1><i class="fas fa-calendar-check"></i> Book Appointment</h1>
@@ -145,20 +140,12 @@
                 <div class="appointments-list">
                     <h3 class="section-heading">My Appointments</h3>
                     <div id="appointmentsList">
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <h4>Dr. Sarah Johnson</h4>
-                                <p><i class="fas fa-stethoscope"></i> Cardiology | May 15, 2026 at 10:30 AM</p>
-                            </div>
-                            <span class="status-badge status-confirmed">Confirmed</span>
                         </div>
-                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Queue Section -->
     <section id="queue" class="section">
         <div class="hero hero-small">
             <h1><i class="fas fa-clock"></i> Live Queue Status</h1>
@@ -196,27 +183,10 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="queue-card">
-                    <div class="queue-header">
-                        <div>
-                            <h3>Upcoming Appointment</h3>
-                            <p class="text-light">Dr. Sarah Johnson - Cardiology</p>
-                        </div>
-                        <div class="wait-time">
-                            <div class="wait-time-number">15 min</div>
-                            <div class="text-small">until check-in</div>
-                        </div>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill pulse" style="width: 85%"></div>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
 
-    <!-- Chatbot -->
     <button class="chatbot-toggle" id="chatToggle" onclick="toggleChat()">
         <i class="fas fa-comment-medical"></i>
     </button>
@@ -246,14 +216,12 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <footer>
         <div class="footer-logo">
             <i class="fas fa-heartbeat"></i>
             MediFlow AI
         </div>
         <p>AI-powered healthcare for everyone. This is a demo application.</p>
-        <p class="footer-note">In a real deployment, this would connect to medical APIs and certified healthcare providers.</p>
     </footer>
 
     <script src="script.js"></script>
